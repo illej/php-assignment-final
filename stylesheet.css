@@ -1,0 +1,14 @@
+* {
+	font-family: consolas;
+}
+
+body {
+	width: 80%;
+	margin: 0 auto;
+}
+
+#msgs {
+	width: 40em;
+	height: 30em;
+	overflow: auto;
+}
