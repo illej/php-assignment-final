@@ -1,5 +1,4 @@
 <?php
-include_once('LanguageParser.php');
 
 class ChatBuilder
 {
@@ -7,13 +6,14 @@ class ChatBuilder
 	protected $db;
 	protected $lastTen;
 	protected $msgCount;
-	protected $msgObj;
+	protected $message;
 	protected $locale;
 	
-	public function __construct($db, $locale)
+	public function __construct($db, $locale, $message)
 	{
 		$this->db = $db;
 		$this->locale = $locale;
+		$this->message = $message;
 	}
 
 	public function setUser($user)
@@ -21,24 +21,14 @@ class ChatBuilder
 		$this->user = $user;
 	}
 	
-	public function getMessageCount($msgObj)
+	public function getMessageCount()
 	{
-		$this->msgObj = $msgObj;
-		
-		/* number of messages */
 		$sqlMsgs = "select count(messageID) as 'count'
 						from message";
 		$resultMsgs = $this->db->query($sqlMsgs);
 		$msgs = $resultMsgs->fetch();
-
 		$this->msgCount = intval($msgs['count']);
-		/*echo '<br>';
-		echo $this->msgCount;
-		echo '<br>';*/
-		$this->lastTen = $this->msgCount - 20;
-		/*echo '<br>';
-		echo $this->lastTen;
-		echo '<br>';*/
+		$this->lastTen = $this->msgCount - 13;
 	}
 	
 	public function getHtmlStructure()
@@ -46,33 +36,39 @@ class ChatBuilder
 		$heading = $this->locale->translateSentence("Live Chat");
 		$greeting = $this->locale->translateSentence("Welcome");
 		$logout = $this->locale->translateSentence("Log Out");
+		$loading = $this->locale->translateSentence("Loading");
+		$submit = $this->locale->translateSentence("Submit");
+		
 		$html = "<h1>$heading</h1>";
 		$html .= "<p>$greeting $this->user (";
 		$html .= '<a id="log-out" href="index.php">';
 		$html .= "$logout</a>)</p>";
 		$html .= '<input id="input" type="text" onchange="go(); resetForm();">';
-		$html .= '<input id="sub" type="submit" onclick="go(); resetForm();">';
-		$html .= '<div id="chat-div" style="display: flex">';
-		$html .= '<div id="msgs">Loading..</div>';
-		$html .= '<div id="user-list">Loading..</div>';
+		$html .= '<input id="sub" type="submit" value="';
+		$html .= "$submit";
+		$html .= '"onclick="go(); resetForm();">';
+		$html .= '<div id="chat-div">';
+		$html .= '<div id="user-list" style"height: 30%">';
+		$html .= "$loading..</div>";
+		$html .= '<div id="msgs" style="overflow: auto; height: 70%">';
+		$html .= "$loading..</div>";
 		$html .= '</div>';
 		return $html;
 	}
 	
-	public function getHtmlContent($msgObj)
+	public function getChatContent()
 	{
-		$lang = new LanguageParser('de');
-		$this->getMessageCount($msgObj);
+		$this->getMessageCount();
 		
-		/* print all messages*/
+		/* Get messages */
 		$htmlContent = '';
 		for ($i = $this->lastTen; $i < $this->msgCount; $i++)
 		{
-			$array = $this->msgObj->getMessage($i + 1);
-			$time = $array['timestamp'];	
+			$array = $this->message->getMessage($i + 1);
+			$time = $array['time'];	
 			$name = $array['username'];	
 			$contentRaw = urldecode($array['content']);
-			$content = $lang->translateSentence($contentRaw);
+			$content = $this->locale->translateSentence($contentRaw);
 			$htmlContent .= '<br>';
 			$htmlContent .= "[$time] $name : $content";
 			$htmlContent .= '<br>';

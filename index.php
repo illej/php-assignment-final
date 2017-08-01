@@ -6,6 +6,9 @@ include_once('user.php');
 session_save_path('./');
 session_start();
 
+include_once('LanguageParser.php');
+$locale = new LanguageParser('kw');
+
 if (isset($_SESSION['user_logged_in']))
 {
 	User::changeStatus($_SESSION['username'], 'inactive');
@@ -19,14 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
 	try
 	{
-		//$db->selectDatabase();
-		// Get username address from request body
-		$username = filter_input(INPUT_POST, 'username');
-		
-		// Get password from request body
-		$password = filter_input(INPUT_POST, 'password');
-		
-		// Find account with email address (THIS IS PSUEDO-CODE)
+		$username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
+		$password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
 		$user = new User();
 		$user->get($username);
 		$pw = $user->getPassword($username);
@@ -35,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		{
 			throw new Exception('Username does no exist');
 		}
-		// Verify password with account password hash
 		if (password_verify($password, $pw) === false)
 		{
 			throw new Exception('Invalid password');
@@ -62,14 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			$user->save();
 		}*/
 		
-		// Save login status to session
 		$_SESSION['user_logged_in'] = 'yes';
 		$_SESSION['username'] = $username;
 		
-		// Redirects to profile page
 		header('HTTP/1.1 302 Redirect');
-		//header('Location: ./chat.php');
-		header('Location: ./test.html');
+		header('Location: ./live-chat.html'); //live-chat.html
 		die();
 	}
 	catch (Exception $e)
@@ -88,16 +81,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body class="container">
-	<h1>Login</h1>
+	<!-- <h1>Login</h1> -->
+	<h1><?php echo $locale->translateSentence('Login'); ?></h1>
 	<form action="index.php" method="POST">
-		<label>Username: </label>
+		<label><?php echo $locale->translateSentence('Username'); ?>: </label>
 		<input type="text" name="username">
 			<br>
-		<label>Password: </label>
+		<label><?php echo $locale->translateSentence('Password'); ?>: </label>
 		<input type="password" name="password">
 			<br>
-		<input type="submit">
+		<input type="submit" value="<?php echo $locale->translateSentence('Submit'); ?>">
 	</form>
-	<a href="registration.php">New User</a>
+	<a href="registration.php"><?php echo $locale->translateSentence('New User'); ?></a>
 </body>
 </html>

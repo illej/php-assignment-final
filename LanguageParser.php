@@ -13,15 +13,14 @@ Class LanguageParser
 	{
 		$array = parse_ini_file('i18n.ini', true);
 		$language = $array[$this->locale];
-		if (array_key_exists($word, $language)) {
-			# code...
+		if (array_key_exists($word, $language))
+		{
 			$newWord = $language[$word];
 		}
 		else
 		{
 			$newWord = $word;
 		}
-		//var_dump($language[$word]);
 		return $newWord;
 	}
 
@@ -29,12 +28,16 @@ Class LanguageParser
 	{
 		$array = explode(' ', $sentence);
 		$newSentence = '';
+		$index = 0;
 		foreach ($array as $word)
 		{
-			$newSentence .= $this->translateWord($word) . ' ';
-			//$newSentence .= ' ';
+			$newSentence .= $this->translateWord($word);
+			if ($index < (count($array) - 1))
+			{
+				$newSentence .= ' ';
+			}
+			$index++;
 		}
-		//var_dump($newSentence);
 		return $newSentence;
 	}
 }

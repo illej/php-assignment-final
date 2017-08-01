@@ -1,4 +1,4 @@
-: a<?php
+<?php
 include_once('db.php');
 include_once('MySQLDB.php');
 
@@ -53,17 +53,6 @@ class User
 		$this->password = $pw;
 	}
 	
-	/*public function getCustomerID($db, $theSurname, $thePassword)
-	{
-		// code for question 3 (a) goes here
-		$sql = "select * from customer where Surname = '$theSurname' and Password = '$thePassword'";
-		$result = $db->query($sql);
-		//var_dump($result);
-		//echo "<br><br>";
-		$row = $result->fetch();
-		return $row;
-	}*/
-	
 	public static function changeStatus($username, $status)
 	{
 		global $db;
@@ -105,5 +94,4 @@ class User
 		$result = $db->query($sql);
 		echo "<br>User saved $this->password<br>";
 	}
-	
 }

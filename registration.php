@@ -2,16 +2,11 @@
 include_once('MySQLDB.php');
 include_once('db.php');
 include_once('user.php');
-
+include_once('LanguageParser.php');
 include_once('builder.php');
 
-/*
-POST /register.php HTTP/1.1
-Content-Length: 43
-Content-Type: application/x-www-form-urlencoded
-
-email=john@example.com&password=sekritshhh!
-*/
+include_once('LanguageParser.php');
+$locale = new LanguageParser('kw');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
@@ -30,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		}
 		
 		// validate username
-		$username = filter_input(INPUT_POST, 'username');
+		$username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
 		if (!$username || $user->get($username))
 		{
 			throw new Exception('Username already exists');
 		}
 		
 		// validate password
-		$password = filter_input(INPUT_POST, 'password');
+		$password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
 		if (!$password || strlen($password) < 8) //mb_strlen() :(
 		{
 			throw new Exception('Password must contain 8+ characters');
@@ -50,18 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			PASSWORD_DEFAULT,
 			['cost' => 12]
 		);
-		var_dump($passwordHash);
 		if ($passwordHash === false)
 		{
 			throw new Exception('Password hash failed');
 		}
 		
-		// Create user account (PSUEDO-CODE)
-		//$user = new user();
 		$user->setInfo($username, $passwordHash, $email);
 		$user->save();
 		
-		// Redirect to longin.php
+		// Redirect to login page
 		header('HTTP/1.1 302 Redirect');
 		header('Location: ./index.php');
 		die();
@@ -83,19 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 <body class="container">
-	<h1>Registration</h1>
+	<h1><?php echo $locale->translateSentence('Registration'); ?></h1>
 	<form action="registration.php" method="POST">
-		<label>Username: </label>
+		<label><?php echo $locale->translateSentence('Username'); ?>: </label>
 		<input type="text" name="username">
 			<br>
-		<label>Email: </label>
+		<label><?php echo $locale->translateSentence('Email'); ?>: </label>
 		<input type="email" name="email">
 			<br>
-		<label>Password: </label>
+		<label><?php echo $locale->translateSentence('Password'); ?>: </label>
 		<input type="password" name="password">
 			<br>
-		<input type="submit">
+		<input type="submit" value="<?php echo $locale->translateSentence('Submit'); ?>">
 	</form>
-	<a href="index.php">Back to Login</a>
+	<a href="index.php"><?php echo $locale->translateSentence('Back to Login'); ?></a>
 </body>
 </html>

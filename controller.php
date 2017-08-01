@@ -9,15 +9,20 @@ include_once('message.php');
 include_once('ChatBuilder.php');
 include_once('user.php');
 include_once('UserListBuilder.php');
+include_once('LanguageParser.php');
 
 /* <<View>> */
 //include_once('MyView.php');
 //$t = new MyView();
 //$t->render('index.phtml');
 
+/* TO DO
+- include VIEWS within if/elses
+- also make refresh send another xhr to controller instead of refreshmsgs/usrs.php
+*/
+
 /* LOCALE */
-include_once('LanguageParser.php');
-$locale = new LanguageParser('de');
+$locale = new LanguageParser('kw');
 
 /* Check SESSION */
 if (isset($_SESSION['username']))
@@ -36,11 +41,12 @@ header('Content-Type: application/json');
 $str = 'No message';
 if (isset($_SERVER['QUERY_STRING']))
 {
-	$chat = new chatBuilder($db, $locale);
+	$message = new Message($db);
+	$chat = new ChatBuilder($db, $locale, $message);
 	$chat->setUser($username);
 	if ($_SERVER['QUERY_STRING'] == 'init')
 	{
-		/* Build ChatBox Structure */
+		/* Build ChatBox structure */
 		echo $chat->getHtmlStructure();
 	}
 	else if ($_SERVER['QUERY_STRING'] == 'users')
@@ -48,37 +54,19 @@ if (isset($_SERVER['QUERY_STRING']))
 		if ($_SESSION['username'] == $username
 			&& $_SESSION['user_logged_in'] == true)
 		{
+			/* Build UserList structure */
 			$usr = new User();
 			$usrList = new UserListBuilder($db, $usr);
 			echo $usrList->buildList();
-
-			$message = new Message($db);
-			$status = 'online';
-			$message->setStatus($username, $status);
-			$message->save();
 		}
 	}
 	else if (isset($_SERVER['QUERY_STRING']))
 	{
+		/* Populate MesssageBox */
 		$str = $_SERVER['QUERY_STRING'];
-		$message = new Message($db);
 		$message->setMessage($username, $str);
 		$message->save();
-		echo $chat->getHtmlContent($message);
+		echo $chat->getChatContent();
+		$message->getStatistics($str);
 	}
 }
-
-
-
-
-/*
-
-$locale = 'de';
-$word = 'hello';
-
-$lang = new LanguageParser($locale);
-$lang->translateWord($word);
-
-$sentence = 'hello my name is elliot';
-$lang->translateSentence($sentence);*/
-

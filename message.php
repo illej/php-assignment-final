@@ -7,37 +7,53 @@ class Message
 	protected $db;
 	protected $content;
 	protected $username;
-	protected $recipient;
 	
-	public function __construct($db/*, $content, $username*/)
+	public function __construct($db)
 	{
-		//database
 		$this->db = $db;
-		//content
-		
 	}
 
 	public function setMessage($username, $content)
 	{
 		$this->content = $content;
 		$this->username = $username;
-		$this->recipient = $this->setRecipient($content);
 	}
 
 	public function getMessage($id)
 	{	
-		/* private messaging */
-		$sql = "select timestamp, username, content
+		$sql = "select time(timestamp) as time, username, content
 				from message
-				where messageID = '$id'
-				and (recipient = 'all'
-				OR recipient = '$this->username')";
-		/*$sql = "select timestamp, username, content
-				from message
-				where messageID = '$id'";*/
+				where messageID = '$id'";
 		$result = $this->db->query($sql);
 		$row = $result->fetch();
 		return $row;
+	}
+	
+	public function getStatistics($content)
+	{
+		$regex = '/^(%3E){2}(\w*)/';
+		if (preg_match($regex, $content, $result))
+		{
+			$user = $result[2];
+			$sql = "select avg(cnt) as average
+					from (
+						select count(messageID) as cnt,
+							concat(CAST(HOUR(timestamp) as CHAR(2)),
+							':',
+							(CASE WHEN MINUTE(timestamp) < 30 THEN '00' ELSE '30' END)) as hour
+						FROM message
+						where username = '$user'
+						GROUP BY CONCAT(CAST(HOUR(timestamp) AS CHAR(2)),
+							':', (CASE WHEN MINUTE(timestamp) < 30 THEN '00' ELSE '30' END))
+						ORDER BY hour
+					) s";
+			$result = $this->db->query($sql);
+			$row = $result->fetch();
+			$average = $row['average'];
+			$html = "**$user has sent an average of $average messages in the last hour.";
+			$this->setMessage($this->username, $html);
+			$this->save();
+		}
 	}
 
 	public function setStatus($username, $status)
@@ -46,32 +62,22 @@ class Message
 		$this->setMessage($username, $content);
 	}
 
-	public function setRecipient($content)
-	{
-		$regex = '/^(%3E){2}(\w*)/';
-		if (preg_match($regex, $content, $result))
-		{
-			$recipient = $result[2];
-		}
-		else
-		{
-			$recipient = 'all';
-		}
-		return $recipient;
-
-	}
-
 	public function save()
 	{
-		$sql = "insert into message values
+		/*$sql = "insert into message values
 				(
 					null,
 					'$this->content',
 					now(),
-					'$this->username',
-					'$this->recipient'
+					'$this->username'
+				)";*/
+		$sql = "insert into message values
+				(	
+					null,
+					'" . $this->content . "',
+					now(),
+					'" . $this->username . "'
 				)";
 		$result = $this->db->query($sql);
 	}
-	
 }

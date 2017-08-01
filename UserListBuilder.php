@@ -27,12 +27,12 @@ class UserListBuilder
 		return $html;
 	}
 
-	public function getHtmlContent($msgObj)
+	/*public function getChatContent($msgObj)
 	{
 		$lang = new LanguageParser('de');
 		$this->getMessageCount($msgObj);
 		
-		/* print all messages*/
+		/* print all messages
 		$htmlContent = '';
 		for ($i = $this->lastTen; $i < $this->msgCount; $i++)
 		{
@@ -46,7 +46,7 @@ class UserListBuilder
 			$htmlContent .= '<br>';
 		}
 		return $htmlContent;
-	}
+	}*/
 
 	public function getUserCount()
 	{
@@ -58,7 +58,6 @@ class UserListBuilder
 		$usrs = $result->fetch();
 
 		$usrCount = intval($usrs['count']);
-		//var_dump($usrCount);
 		return $usrCount;
 	}
 }

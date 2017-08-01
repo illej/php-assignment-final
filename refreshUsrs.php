@@ -19,5 +19,3 @@ else
 $usr = new User();
 $usrList = new UserListBuilder($db, $usr);
 echo $usrList->buildList();
-
-//var_dump($usrList->buildList());

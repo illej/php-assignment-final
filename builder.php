@@ -8,20 +8,15 @@ class Builder
 	{
 		global $db;
 		$db->dropDatabase();
-		//  create the database again
-		$db->createDatabase(); // worked
-		// select the database
-		$db->selectDatabase(); // worked
-
+		$db->createDatabase();
+		$db->selectDatabase();
 		// drop the tables
 		$sql = "drop table if exists user";
 		$result = $db->query($sql);
-
 		$sql = "drop table if exists message";
 		$result = $db->query($sql);
 
-		// create the tables
-		/* USER */
+		/* USER TABLE */
 		$sql = "create table user
 		(
 			username varchar(30) not null unique,
@@ -30,7 +25,6 @@ class Builder
 			status varchar(20),
 			primary key(username)
 		) ENGINE = InnoDB";
-
 		$result = $db->query($sql);
 		if ($result)
 		{
@@ -40,7 +34,6 @@ class Builder
 		{
 			echo 'the user table was not added<br>';
 		}
-
 		/* MESSAGE */
 		$sql = "create table message
 		(
@@ -48,12 +41,9 @@ class Builder
 			content text,
 			timestamp timestamp,
 			username varchar(30),
-			recipient varchar(30),
 			foreign key(username) references user(username),
 			primary key(messageID)
 		) ENGINE = InnoDB";
-									 
-		//  execute the sql query
 		$result = $db->query($sql);
 		if ($result)
 		{
@@ -77,8 +67,6 @@ class Builder
 			'van Maanen',
 			'jdlifta@gmail.com'
 		)";
-
-		//  execute the sql query
 		$result = $db->query($sql);
 
 		$sql = "insert into user values
@@ -90,10 +78,8 @@ class Builder
 			'Mackle',
 			'beatmasta@gmail.com'
 		)";
-
 		//  execute the sql query
-		$result = $db->query($sql);
-				   
+		$result = $db->query($sql);	   
 		/* MESSAGE */    
 		$sql = "insert into message values
 		(
@@ -102,7 +88,6 @@ class Builder
 			now(),
 			1
 		)";
-
 		$result = $db->query($sql);
 
 		$sql = "insert into message values
@@ -112,7 +97,6 @@ class Builder
 			now(),
 			2
 		)";
-
 		$result = $db->query($sql);
 
 		$sql = "insert into message values
@@ -122,7 +106,6 @@ class Builder
 			now(),
 			1
 		)";
-
 		$result = $db->query($sql);
 
 		$sql = "insert into message values
@@ -132,7 +115,6 @@ class Builder
 			now(),
 			2
 		)";
-
 		$result = $db->query($sql);
 	}
 }

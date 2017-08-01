@@ -100,10 +100,10 @@ class MySQL
    }
 
    
-   	function createTable($table, $sql )
+	function createTable($table, $sql)
 	{
 		$result = $db->query($sql);
-		if ( $result == True )
+		if ($result == True)
 		{
 			echo "$table was added<br>";
 		}
@@ -111,21 +111,18 @@ class MySQL
 		{
 			echo "$table was not added<br>";
 		}
-   }
-   
+	}
 
-	function query( $sql )
+	function query($sql)
 	{
-		mysqli_query( $this->dbConn, "set character_set_results='utf8'"); 
-		 if (!$queryResource = mysqli_query($this->dbConn, $sql ))
-		 {
-			trigger_error ( 'Query Failed: <br>' . mysqli_error($this->dbConn ) . '<br> SQL: ' . $sql );
+		mysqli_query($this->dbConn, "set character_set_results='utf8'"); 
+		if (!$queryResource = mysqli_query($this->dbConn, $sql))
+		{
+			trigger_error('Query Failed: <br>' . mysqli_error($this->dbConn) . '<br> SQL: ' . $sql);
 			return false;
-		 }
-	 
-		 return new MySQLResult( $this, $queryResource ); 
-   }
-   
+		}
+		return new MySQLResult( $this, $queryResource ); 
+	}
 }
 
 
@@ -145,22 +142,22 @@ class MySQLResult
         return mysqli_num_rows($this->query);
     }
 
-    function fetch()
-    {
-  		if ( $row = mysqli_fetch_array( $this->query , MYSQLI_ASSOC ))
-  		{
-  		   return $row;
-  		}
-			   else if ( $this->size() > 0 )
-       {
-           mysqli_data_seek ( $this->query , 0 );
-           return false;
-       }
-       else
-       {
-           return false;
-       }         
-    }
+	function fetch()
+	{
+		if ($row = mysqli_fetch_array($this->query, MYSQLI_ASSOC))
+		{
+			return $row;
+		}
+		else if ($this->size() > 0)
+		{
+			mysqli_data_seek($this->query, 0);
+			return false;
+		}
+		else
+		{
+			return false;
+		}         
+	}
 
     function insertID()
     {
