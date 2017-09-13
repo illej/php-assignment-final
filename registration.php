@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
 	try
 	{
-		//$build = new Builder();
-		//$build->buildDatabase();
+		$build = new Builder();
+		$build->buildDatabase();
 
 		$user = new User();
 		
